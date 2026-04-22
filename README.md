@@ -3,7 +3,7 @@
 Predict whether a telecom customer will churn using machine learning.
 
 ## Live Demo
-[Link to be added after deployment]
+(https://churn-prediction-276fanpncsvtjeuopguivf.streamlit.app)
 
 ## Dataset
 Kaggle Telco Customer Churn — 7043 real customers, 21 features

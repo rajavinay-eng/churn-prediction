@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -8,7 +9,8 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
 
 print("=" * 60)
 print("CUSTOMER CHURN PREDICTION — TELCO DATASET")
@@ -92,6 +94,22 @@ print("=" * 60)
 for name, model in models.items():
     model.fit(X_train_scaled, y_train)
     y_pred = model.predict(X_test_scaled)
+
+    y_pred = model.predict(X_test_scaled)
+
+cm = confusion_matrix(y_test, y_pred)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=['Stay', 'Churn']
+)
+
+disp.plot(cmap='Blues')
+plt.title(f'{name} — Confusion Matrix')
+plt.savefig(f'{name}_confusion_matrix.png', dpi=150)
+plt.show()
+
+acc = accuracy_score(y_test, y_pred)
 
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)

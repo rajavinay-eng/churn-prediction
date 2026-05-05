@@ -7,8 +7,8 @@ Predict whether a telecom customer will churn using machine learning.
 ## Dataset
 
 Kaggle Telco Customer Churn  
- 7,043 customers  
- 21 features  
+7,043 customers  
+21 features  
 
 ---
 
@@ -29,11 +29,10 @@ Kaggle Telco Customer Churn
 ## Confusion Matrix Analysis
 
 ### Random Forest
-
- True Negatives: 828  
- False Positives: 207  
- False Negatives: 125  
- True Positives: 249  
+- True Negatives: 828  
+- False Positives: 207  
+- False Negatives: 125  
+- True Positives: 249  
 
 ---
 
@@ -41,8 +40,8 @@ Kaggle Telco Customer Churn
 
 Missing churners is more costly than false alarms.
 
- False Negative → lost customer (high cost)  
-False Positive → extra retention effort (low cost)  
+- False Negative → lost customer (high cost)  
+- False Positive → extra retention effort (low cost)  
 
 Model is optimized for **Recall** to reduce revenue loss.
 
@@ -50,7 +49,6 @@ Model is optimized for **Recall** to reduce revenue loss.
 
 ## Model Evaluation Visuals
 
-### Random Forest
 ### Random Forest
 ![Random Forest](RandomForest_confusion_matrix.png)
 
@@ -60,25 +58,19 @@ Model is optimized for **Recall** to reduce revenue loss.
 ### Logistic Regression
 ![Logistic Regression](LogisticRegression_confusion_matrix.png)
 
-### Decision Tree
-DecisionTree_confusion_matrix.png
-
-### Logistic Regression
-LogisticRegression_confusion_matrix.png
-
 ---
 
 ## What I Built
 
- Data cleaning (TotalCharges fix, encoding)
- Feature engineering (avg_monthly_spend)
- Feature selection using Random Forest importance
- Compared 3 models (Logistic Regression, Decision Tree, Random Forest)
- Handled class imbalance using class_weight
- Threshold tuning for business trade-off
- Confusion matrix analysis
- Cross-validation (F1: 0.587)
- Streamlit web app for predictions
+- Data cleaning (TotalCharges fix, encoding)  
+- Feature engineering (avg_monthly_spend)  
+- Feature selection using Random Forest importance  
+- Compared 3 models (Logistic Regression, Decision Tree, Random Forest)  
+- Handled class imbalance using class_weight  
+- Threshold tuning for business trade-off  
+- Confusion matrix analysis  
+- Cross-validation (F1: 0.587)  
+- Streamlit web app for predictions  
 
 ---
 

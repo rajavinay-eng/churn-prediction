@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     confusion_matrix, ConfusionMatrixDisplay,
     accuracy_score, f1_score, precision_score, recall_score,
-    classification_report
+    classification_report, roc_auc_score
 )
 
 print("=" * 60)
@@ -34,7 +34,6 @@ df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
 df['TotalCharges'] = df['TotalCharges'].fillna(df['TotalCharges'].median())
 df = df.drop('customerID', axis=1)
 
-# Target
 df['Churn'] = df['Churn'].map({'No': 0, 'Yes': 1})
 
 # STEP 4: Feature engineering
@@ -45,28 +44,21 @@ for column in df.columns:
     if df[column].dtype == 'object':
         df[column] = LabelEncoder().fit_transform(df[column].astype(str))
 
-# STEP 6: Features/target
+# STEP 6
 X = df.drop('Churn', axis=1)
 y = df['Churn']
 
-print(f"\nTarget: Stay={sum(y==0)}, Churn={sum(y==1)}")
-
-# STEP 7: Feature selection
+# STEP 7
 X = X.apply(pd.to_numeric, errors='coerce').fillna(0)
 
 temp_rf = RandomForestClassifier(n_estimators=50, random_state=42)
 temp_rf.fit(X, y)
 
 importances = pd.Series(temp_rf.feature_importances_, index=X.columns)
-importances_sorted = importances.sort_values(ascending=False)
-
-print("\nTop important features:")
-print(importances_sorted.head(10).round(3))
-
-top_features = importances_sorted[importances_sorted > 0.02].index.tolist()
+top_features = importances[importances > 0.02].index.tolist()
 X = X[top_features]
 
-# STEP 8: Train/test split
+# STEP 8
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
@@ -75,105 +67,68 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-print(f"\nTraining: {len(X_train)} | Testing: {len(X_test)}")
-
-# STEP 9: Models
+# STEP 9
 models = {
-    "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
-    "Decision Tree": DecisionTreeClassifier(max_depth=5, random_state=42),
+    "Logistic Regression": LogisticRegression(max_iter=1000),
+    "Decision Tree": DecisionTreeClassifier(max_depth=5),
     "Random Forest": RandomForestClassifier(
-        n_estimators=100, max_depth=10,
-        class_weight='balanced', random_state=42
+        n_estimators=100, max_depth=10, class_weight='balanced'
     )
 }
 
 results = {}
-print("\n" + "=" * 60)
-print("MODEL COMPARISON")
-print("=" * 60)
 
 for name, model in models.items():
     model.fit(X_train_scaled, y_train)
     y_pred = model.predict(X_test_scaled)
 
-    # Confusion matrix
     cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(
-        confusion_matrix=cm,
-        display_labels=['Stay', 'Churn']
-    )
-
-    disp.plot(cmap='Blues')
-    plt.title(f'{name} — Confusion Matrix')
-    plt.savefig(f'{name}_confusion_matrix.png', dpi=150)
+    disp = ConfusionMatrixDisplay(cm, display_labels=['Stay','Churn'])
+    disp.plot()
+    plt.savefig(f"{name}_confusion_matrix.png")
     plt.close()
 
-    # Metrics
-    acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
-    prec = precision_score(y_test, y_pred)
-    rec = recall_score(y_test, y_pred)
-
     results[name] = {"model": model, "pred": y_pred, "f1": f1}
 
-    print(f"\n{name}")
-    print(f"Accuracy: {acc:.3f} | F1: {f1:.3f}")
-    print(f"Precision: {prec:.3f} | Recall: {rec:.3f}")
-
-# STEP 10: Best model
+# STEP 10
 best_name = max(results, key=lambda x: results[x]["f1"])
 best_model = results[best_name]["model"]
 best_pred = results[best_name]["pred"]
 
-print("\n" + "=" * 60)
-print(f"BEST MODEL: {best_name}")
-print("=" * 60)
-
+print(f"\nBEST MODEL: {best_name}")
 print(classification_report(y_test, best_pred))
 
-cm = confusion_matrix(y_test, best_pred)
-tn, fp, fn, tp = cm.ravel()
+# ROC-AUC
+y_proba = best_model.predict_proba(X_test_scaled)[:,1]
+roc = roc_auc_score(y_test, y_proba)
+print(f"ROC-AUC: {roc:.3f}")
 
-print(f"\nTN:{tn} FP:{fp} FN:{fn} TP:{tp}")
-print(f"Recall: {tp/(tp+fn):.2f}")
-print(f"Precision: {tp/(tp+fp+1e-6):.2f}")
+# FEATURE IMPORTANCE
+if best_name == "Random Forest":
+    feat_imp = pd.Series(best_model.feature_importances_, index=X.columns)
+    feat_imp = feat_imp.sort_values(ascending=False).head(10)
 
-# STEP 11: Threshold tuning
-print("\nThreshold tuning:")
-proba = best_model.predict_proba(X_test_scaled)[:, 1]
+    print("\nTop Features:")
+    print(feat_imp)
 
-for t in [0.3, 0.4, 0.5, 0.6]:
-    pred = (proba >= t).astype(int)
-    print(f"{t} → F1: {f1_score(y_test, pred):.3f}")
+    plt.figure()
+    feat_imp.plot(kind='barh')
+    plt.gca().invert_yaxis()
+    plt.savefig("feature_importance.png")
+    plt.close()
 
-# STEP 12: Business output
-X_test_df = X_test.copy()
-X_test_df['prob'] = proba
+# STEP 11
+proba = best_model.predict_proba(X_test_scaled)[:,1]
 
-high_risk = X_test_df[X_test_df['prob'] > 0.5]
-print(f"\nHigh risk customers: {len(high_risk)}")
+# STEP 12
+cv = cross_val_score(best_model, X, y, cv=5, scoring='f1')
+print(f"CV F1: {cv.mean():.3f}")
 
-# STEP 13: Cross-validation
-rf_cv = RandomForestClassifier(
-    n_estimators=100, max_depth=10,
-    class_weight='balanced', random_state=42
-)
-
-cv_scores = cross_val_score(rf_cv, X, y, cv=5, scoring='f1')
-print(f"\nCV F1: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
-
-print("\nPROJECT COMPLETE")
-
-# SAVE FILES
+# SAVE
 import pickle
+pickle.dump(best_model, open("model.pkl","wb"))
+pickle.dump(scaler, open("scaler.pkl","wb"))
+pickle.dump(top_features, open("features.pkl","wb"))
 
-with open("model.pkl", "wb") as f:
-    pickle.dump(best_model, f)
-
-with open("scaler.pkl", "wb") as f:
-    pickle.dump(scaler, f)
-
-with open("features.pkl", "wb") as f:
-    pickle.dump(top_features, f)
-
-print("Files saved")
+print("PROJECT COMPLETE")

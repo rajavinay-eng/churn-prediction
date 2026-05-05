@@ -9,8 +9,11 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report
+from sklearn.metrics import (
+    confusion_matrix, ConfusionMatrixDisplay,
+    accuracy_score, f1_score, precision_score, recall_score,
+    classification_report
+)
 
 print("=" * 60)
 print("CUSTOMER CHURN PREDICTION — TELCO DATASET")
@@ -31,7 +34,7 @@ df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
 df['TotalCharges'] = df['TotalCharges'].fillna(df['TotalCharges'].median())
 df = df.drop('customerID', axis=1)
 
-# 🔥 FIX TARGET
+# Target
 df['Churn'] = df['Churn'].map({'No': 0, 'Yes': 1})
 
 # STEP 4: Feature engineering
@@ -40,8 +43,7 @@ df["avg_monthly_spend"] = df["TotalCharges"] / (df["tenure"] + 1)
 # STEP 5: Encoding
 for column in df.columns:
     if df[column].dtype == 'object':
-        df[column] = df[column].astype(str)
-        df[column] = LabelEncoder().fit_transform(df[column])
+        df[column] = LabelEncoder().fit_transform(df[column].astype(str))
 
 # STEP 6: Features/target
 X = df.drop('Churn', axis=1)
@@ -50,8 +52,7 @@ y = df['Churn']
 print(f"\nTarget: Stay={sum(y==0)}, Churn={sum(y==1)}")
 
 # STEP 7: Feature selection
-X = X.apply(pd.to_numeric, errors='coerce')
-X = X.fillna(0)
+X = X.apply(pd.to_numeric, errors='coerce').fillna(0)
 
 temp_rf = RandomForestClassifier(n_estimators=50, random_state=42)
 temp_rf.fit(X, y)
@@ -95,22 +96,19 @@ for name, model in models.items():
     model.fit(X_train_scaled, y_train)
     y_pred = model.predict(X_test_scaled)
 
-    y_pred = model.predict(X_test_scaled)
+    # Confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=['Stay', 'Churn']
+    )
 
-cm = confusion_matrix(y_test, y_pred)
+    disp.plot(cmap='Blues')
+    plt.title(f'{name} — Confusion Matrix')
+    plt.savefig(f'{name}_confusion_matrix.png', dpi=150)
+    plt.close()
 
-disp = ConfusionMatrixDisplay(
-    confusion_matrix=cm,
-    display_labels=['Stay', 'Churn']
-)
-
-disp.plot(cmap='Blues')
-plt.title(f'{name} — Confusion Matrix')
-plt.savefig(f'{name}_confusion_matrix.png', dpi=150)
-plt.show()
-
-acc = accuracy_score(y_test, y_pred)
-
+    # Metrics
     acc = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred)
     prec = precision_score(y_test, y_pred)
@@ -162,13 +160,11 @@ rf_cv = RandomForestClassifier(
 )
 
 cv_scores = cross_val_score(rf_cv, X, y, cv=5, scoring='f1')
-
 print(f"\nCV F1: {cv_scores.mean():.3f} ± {cv_scores.std():.3f}")
 
 print("\nPROJECT COMPLETE")
 
-
-# SAVE MODEL FILES
+# SAVE FILES
 import pickle
 
 with open("model.pkl", "wb") as f:

@@ -22,29 +22,29 @@ Kaggle Telco Customer Churn — 7043 real customers, 21 features
 
 ---
 
-## 📊 Confusion Matrix Analysis
+## Confusion Matrix Analysis
 
 **Random Forest Performance**
 
-* True Negatives: 828
-* False Positives: 207
-* False Negatives: 125
-* True Positives: 249
+ True Negatives: 828
+ False Positives: 207
+ False Negatives: 125
+ True Positives: 249
 
 ---
 
-## 💡 Business Insight
+##  Business Insight
 
 We prioritize **Recall over Precision**.
 
-* False Negative = missed churn → lost customer ❗
-* False Positive = unnecessary retention effort → low cost
+ False Negative = missed churn → lost customer 
+ False Positive = unnecessary retention effort → low cost
 
-👉 Minimizing False Negatives is critical for business revenue.
+ Minimizing False Negatives is critical for business revenue.
 
 ---
 
-## 📉 Visualizations
+##  Visualizations
 
 ![Random Forest](Random Forest_confusion_matrix.png)
 ![Decision Tree](Decision Tree_confusion_matrix.png)
@@ -54,14 +54,14 @@ We prioritize **Recall over Precision**.
 
 ## What I Built
 
-* Real data cleaning (TotalCharges fix, encoding)
-* Feature engineering (avg_monthly_spend)
-* Feature selection using Random Forest importance
-* 3 model comparison with F1 evaluation
-* Threshold tuning for business tradeoff
-* Confusion matrix analysis
-* Cross-validation (F1: 0.592 ± 0.010)
-* Streamlit web app with live predictions
+ Real data cleaning (TotalCharges fix, encoding)
+ Feature engineering (avg_monthly_spend)
+ Feature selection using Random Forest importance
+ 3 model comparison with F1 evaluation
+ Threshold tuning for business tradeoff
+ Confusion matrix analysis
+ Cross-validation (F1: 0.592 ± 0.010)
+ Streamlit web app with live predictions
 
 ---
 
@@ -78,4 +78,3 @@ streamlit run app.py
 ## Tech Stack
 
 Python · scikit-learn · Pandas · NumPy · Streamlit
-

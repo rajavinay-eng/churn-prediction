@@ -6,62 +6,72 @@ Predict whether a telecom customer will churn using machine learning.
 
 ## Dataset
 
-Kaggle Telco Customer Churn — 7043 real customers, 21 features
+Kaggle Telco Customer Churn  
+ 7,043 customers  
+ 21 features  
 
 ---
 
-## Results
+## Model Evaluation
 
-| Model               | Accuracy | F1 Score | Recall |
-| ------------------- | -------- | -------- | ------ |
-| Logistic Regression | 0.789    | 0.532    | 0.452  |
-| Decision Tree       | 0.789    | 0.493    | 0.388  |
-| Random Forest       | 0.764    | 0.600    | 0.666  |
+| Metric | Score |
+|--------|------|
+| Accuracy | 0.76 |
+| F1 Score | 0.60 |
+| Recall | 0.66 |
+| ROC-AUC | 0.81 |
+| Cross-validation F1 | 0.587 |
 
-**Best Model:** Random Forest with class_weight balanced
+**Best Model:** Random Forest (class_weight="balanced")
 
 ---
 
 ## Confusion Matrix Analysis
 
-**Random Forest Performance**
+### Random Forest
 
- True Negatives: 828
- False Positives: 207
- False Negatives: 125
- True Positives: 249
-
----
-
-##  Business Insight
-
-We prioritize **Recall over Precision**.
-
- False Negative = missed churn → lost customer 
- False Positive = unnecessary retention effort → low cost
-
- Minimizing False Negatives is critical for business revenue.
+ True Negatives: 828  
+ False Positives: 207  
+ False Negatives: 125  
+ True Positives: 249  
 
 ---
 
-##  Visualizations
+## Business Insight
 
-![Random Forest](Random Forest_confusion_matrix.png)
-![Decision Tree](Decision Tree_confusion_matrix.png)
-![Logistic Regression](Logistic Regression_confusion_matrix.png)
+Missing churners is more costly than false alarms.
+
+ False Negative → lost customer (high cost)  
+False Positive → extra retention effort (low cost)  
+
+Model is optimized for **Recall** to reduce revenue loss.
+
+---
+
+## Model Evaluation Visuals
+
+### Random Forest
+![Random Forest](RandomForest_confusion_matrix.png)
+
+### Decision Tree
+![Decision Tree](DecisionTree_confusion_matrix.png)
+
+### Logistic Regression
+![Logistic Regression](LogisticRegression_confusion_matrix.png)
 
 ---
 
 ## What I Built
 
- Real data cleaning (TotalCharges fix, encoding)
+ Data cleaning (TotalCharges fix, encoding)
  Feature engineering (avg_monthly_spend)
  Feature selection using Random Forest importance
- 3 model comparison with F1 evaluation
- Threshold tuning for business tradeoff
+ Compared 3 models (Logistic Regression, Decision Tree, Random Forest)
+ Handled class imbalance using class_weight
+ Threshold tuning for business trade-off
  Confusion matrix analysis
- Cross-validation (F1: 0.592 ± 0.010)
- Streamlit web app with live predictions
+ Cross-validation (F1: 0.587)
+ Streamlit web app for predictions
 
 ---
 
@@ -71,10 +81,3 @@ We prioritize **Recall over Precision**.
 pip install -r requirements.txt
 python churn_model.py
 streamlit run app.py
-```
-
----
-
-## Tech Stack
-
-Python · scikit-learn · Pandas · NumPy · Streamlit

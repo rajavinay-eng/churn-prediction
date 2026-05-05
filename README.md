@@ -50,13 +50,13 @@ Model is optimized for **Recall** to reduce revenue loss.
 ## Model Evaluation Visuals
 
 ### Random Forest
-![Random Forest](Random Forest_confusion_matrix.png)
+![Random Forest](./Random%20Forest_confusion_matrix.png)
 
 ### Decision Tree
-![Decision Tree](Decision Tree_confusion_matrix.png)
+![Decision Tree](./Decision%20Tree_confusion_matrix.png)
 
 ### Logistic Regression
-![Logistic Regression](Logistic Regression_confusion_matrix.png)
+![Logistic Regression](./Logistic%20Regression_confusion_matrix.png)
 
 ---
 
